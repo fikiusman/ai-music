@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Music Generator</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1d1e22, #2a2b30);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    input, select, button, textarea {
+      width: 300px;
+      margin: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    audio {
+      margin-top: 20px;
+      width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎵 AI Music Generator</h1>
+  <p>Masukkan judul, lirik, dan gaya musik yang kamu inginkan</p>
+
+  <input type="text" id="title" placeholder="Judul Lagu"><br>
+  <textarea id="lyrics" rows="4" placeholder="Tulis lirik di sini..."></textarea><br>
+  <select id="style">
+    <option value="pop">Pop</option>
+    <option value="lofi">Lo-Fi</option>
+    <option value="rock">Rock</option>
+    <option value="rap">Rap</option>
+    <option value="sad">Sad / Emotional</option>
+  </select><br>
+  <button onclick="generateMusic()">🎧 Generate Music</button>
+
+  <div id="status"></div>
+  <audio id="player" controls></audio>
+
+  <script>
+    async function generateMusic() {
+      const title = document.getElementById('title').value;
+      const lyrics = document.getElementById('lyrics').value;
+      const style = document.getElementById('style').value;
+      const status = document.getElementById('status');
+      const player = document.getElementById('player');
+
+      status.innerText = "⏳ Sedang membuat musik dengan AI...";
+      player.src = "";
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, lyrics, style })
+        });
+        const data = await res.json();
+
+        if (data.url) {
+          status.innerText = "✅ Musik berhasil dibuat!";
+          player.src = data.url;
+        } else {
+          status.innerText = "❌ Gagal membuat musik.";
+        }
+      } catch (err) {
+        console.error(err);
+        status.innerText = "⚠️ Terjadi kesalahan.";
+      }
+    }
+  </script>
+</body>
+</html>
